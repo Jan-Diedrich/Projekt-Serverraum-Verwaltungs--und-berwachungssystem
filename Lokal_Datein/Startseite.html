@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Serverraum Dashboard</title>
+  <link rel="stylesheet" href="css.css" />
+</head>
+<body>
+  <div class="dashboard">
+
+    <header class="header">
+      <div>
+        <h1>Serverraum Dashboard</h1>
+        <p>Überwachungs- und Verwaltungssystem</p>
+      </div>
+      <div class="header-status">
+        <span class="status-dot active"></span>
+        <span>System aktiv</span>
+      </div>
+    </header>
+
+    <main class="grid-container">
+
+      <section class="card">
+        <h2>Umweltwerte</h2>
+        <div class="sensor-grid">
+
+          <div class="sensor-box" id="temperatur-box">
+            <h3>Temperatur</h3>
+            <p class="value" id="temperatur">--°C</p>
+            <span class="badge ok" id="temperatur-status">OK</span>
+          </div>
+
+          <div class="sensor-box" id="luft-box">
+            <h3>Luftfeuchtigkeit</h3>
+            <p class="value" id="luftfeuchtigkeit">--%</p>
+            <span class="badge ok" id="luft-status">OK</span>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Lüftersteuerung</h2>
+        <div class="fan-status">
+          <p><strong>Status:</strong> Eingeschaltet</p>
+          <p><strong>Modus:</strong> Automatik</p>
+          <p><strong>Grund:</strong> Temperatur über Grenzwert</p>
+        </div>
+        <div class="button-group">
+          <button class="btn">Lüfter EIN</button>
+          <button class="btn secondary">Lüfter AUS</button>
+        </div>
+      </section>
+
+      <section class="card wide">
+        <h2>Geräuschüberwachung</h2>
+        <div class="noise-section">
+          <div class="noise-info">
+            <p class="value">68 dB</p>
+            <span class="badge warning">Warnung</span>
+          </div>
+          <div class="noise-bar-container">
+            <div class="noise-bar"></div>
+          </div>
+          <p class="noise-text">Aktuelle Lautstärke im Serverraum</p>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Zutritt & Türstatus</h2>
+        <div class="door-status">
+          <p><strong>Türstatus:</strong> Geschlossen</p>
+          <p><strong>Letzter RFID-Zugriff:</strong> Max Mustermann</p>
+          <p><strong>Zeitpunkt:</strong> 14:37 Uhr</p>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Ereignisprotokoll</h2>
+        <ul class="log-list">
+          <li>System gestartet</li>
+        </ul>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    async function ladeDaten() {
+      try {
+        const res = await fetch("http://192.168.2.226:5000/data");
+        const data = await res.json();
+
+        // Werte anzeigen
+        document.getElementById("temperatur").innerText = data.temperatur + "°C";
+        document.getElementById("luftfeuchtigkeit").innerText = data.luftfeuchtigkeit + "%";
+
+        // Temperatur Logik
+        let tBox = document.getElementById("temperatur-box");
+        let tStatus = document.getElementById("temperatur-status");
+
+        if (data.temperatur < 28) {
+          tBox.className = "sensor-box normal";
+          tStatus.className = "badge ok";
+          tStatus.innerText = "OK";
+        } else if (data.temperatur < 32) {
+          tBox.className = "sensor-box warning";
+          tStatus.className = "badge warning";
+          tStatus.innerText = "Warnung";
+        } else {
+          tBox.className = "sensor-box critical";
+          tStatus.className = "badge critical";
+          tStatus.innerText = "Kritisch";
+        }
+
+        // Luft Logik
+        let lBox = document.getElementById("luft-box");
+        let lStatus = document.getElementById("luft-status");
+
+        if (data.luftfeuchtigkeit >= 40 && data.luftfeuchtigkeit <= 60) {
+          lBox.className = "sensor-box normal";
+          lStatus.className = "badge ok";
+          lStatus.innerText = "OK";
+        } else if (data.luftfeuchtigkeit >= 30 && data.luftfeuchtigkeit <= 70) {
+          lBox.className = "sensor-box warning";
+          lStatus.className = "badge warning";
+          lStatus.innerText = "Warnung";
+        } else {
+          lBox.className = "sensor-box critical";
+          lStatus.className = "badge critical";
+          lStatus.innerText = "Kritisch";
+        }
+
+      } catch (err) {
+        console.log("Fehler:", err);
+      }
+    }
+
+    ladeDaten();
+    setInterval(ladeDaten, 3000);
+  </script>
+</body>
+</html>
