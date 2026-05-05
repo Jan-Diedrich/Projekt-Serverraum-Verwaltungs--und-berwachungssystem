@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Serverraum Dashboard</title>
-  <link rel="stylesheet" href="css.css" />
+  <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
   <div class="dashboard">
@@ -12,7 +12,7 @@
     <header class="header">
       <div>
         <h1>Serverraum Dashboard</h1>
-        <p>Ãœberwachungs- und Verwaltungssystem</p>
+        <p>Überwachungs- und Verwaltungssystem</p>
       </div>
       <div class="header-status">
         <span class="status-dot active"></span>
@@ -28,7 +28,7 @@
 
           <div class="sensor-box" id="temperatur-box">
             <h3>Temperatur</h3>
-            <p class="value" id="temperatur">--Â°C</p>
+            <p class="value" id="temperatur">--°C</p>
             <span class="badge ok" id="temperatur-status">OK</span>
           </div>
 
@@ -42,20 +42,16 @@
       </section>
 
       <section class="card">
-        <h2>LÃ¼ftersteuerung</h2>
+        <h2>Lüftersteuerung</h2>
         <div class="fan-status">
-          <p><strong>Status:</strong> Eingeschaltet</p>
+          <p><strong>Status:</strong> <span id="motor-status">--</span></p>
           <p><strong>Modus:</strong> Automatik</p>
-          <p><strong>Grund:</strong> Temperatur Ã¼ber Grenzwert</p>
-        </div>
-        <div class="button-group">
-          <button class="btn">LÃ¼fter EIN</button>
-          <button class="btn secondary">LÃ¼fter AUS</button>
+          <p><strong>Grund:</strong> <span id="motor-grund">--</span></p>
         </div>
       </section>
 
       <section class="card wide">
-        <h2>GerÃ¤uschÃ¼berwachung</h2>
+        <h2>Geräuschüberwachung</h2>
         <div class="noise-section">
           <div class="noise-info">
             <p class="value">68 dB</p>
@@ -64,14 +60,14 @@
           <div class="noise-bar-container">
             <div class="noise-bar"></div>
           </div>
-          <p class="noise-text">Aktuelle LautstÃ¤rke im Serverraum</p>
+          <p class="noise-text">Aktuelle Lautstärke im Serverraum</p>
         </div>
       </section>
 
       <section class="card">
-        <h2>Zutritt & TÃ¼rstatus</h2>
+        <h2>Zutritt & Türstatus</h2>
         <div class="door-status">
-          <p><strong>TÃ¼rstatus:</strong> Geschlossen</p>
+          <p><strong>Türstatus:</strong> Geschlossen</p>
           <p><strong>Letzter RFID-Zugriff:</strong> Max Mustermann</p>
           <p><strong>Zeitpunkt:</strong> 14:37 Uhr</p>
         </div>
@@ -90,12 +86,17 @@
   <script>
     async function ladeDaten() {
       try {
-        const res = await fetch("http://192.168.2.226:5000/data");
+        // ?? WICHTIG: Jetzt vom Server laden
+        const res = await fetch("/daten/sensor_data.json");
         const data = await res.json();
 
         // Werte anzeigen
-        document.getElementById("temperatur").innerText = data.temperatur + "Â°C";
+        document.getElementById("temperatur").innerText = data.temperatur + "°C";
         document.getElementById("luftfeuchtigkeit").innerText = data.luftfeuchtigkeit + "%";
+
+        // Motor anzeigen
+        document.getElementById("motor-status").innerText = data.motor;
+        document.getElementById("motor-grund").innerText = data.motor_grund;
 
         // Temperatur Logik
         let tBox = document.getElementById("temperatur-box");
