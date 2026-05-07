@@ -39,7 +39,7 @@ def data():
         if temperatur > GRENZWERT_TEMP:
             GPIO.output(MOTOR_PIN, GPIO.HIGH)
             motor_status = "AN"
-            motor_grund = "Temperatur ï¿½ber Grenzwert"
+            motor_grund = "Temperatur über Grenzwert"
         else:
             GPIO.output(MOTOR_PIN, GPIO.LOW)
             motor_status = "AUS"
@@ -60,7 +60,7 @@ def data():
 @app.route("/")
 def startseite():
     return jsonify({
-        "status": "Sensor API lï¿½uft",
+        "status": "Sensor API luft",
         "endpunkt": "/data"
     })
 
