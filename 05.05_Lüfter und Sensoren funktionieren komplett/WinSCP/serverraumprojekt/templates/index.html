@@ -86,19 +86,19 @@
   <script>
     async function ladeDaten() {
       try {
-        // ?? WICHTIG: Jetzt vom Server laden
+
         const res = await fetch("/daten/sensor_data.json");
         const data = await res.json();
 
-        // Werte anzeigen
+
         document.getElementById("temperatur").innerText = data.temperatur + "°C";
         document.getElementById("luftfeuchtigkeit").innerText = data.luftfeuchtigkeit + "%";
 
-        // Motor anzeigen
+
         document.getElementById("motor-status").innerText = data.motor;
         document.getElementById("motor-grund").innerText = data.motor_grund;
 
-        // Temperatur Logik
+
         let tBox = document.getElementById("temperatur-box");
         let tStatus = document.getElementById("temperatur-status");
 
@@ -116,7 +116,7 @@
           tStatus.innerText = "Kritisch";
         }
 
-        // Luft Logik
+
         let lBox = document.getElementById("luft-box");
         let lStatus = document.getElementById("luft-status");
 
