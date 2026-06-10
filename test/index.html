@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Serverraum Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<div class="dashboard">
+
+    <div class="header">
+        <div>
+            <h1>Serverraum Dashboard</h1>
+            <p>Überwachungs- und Verwaltungssystem</p>
+        </div>
+
+        <div class="header-status">
+            <span>System aktiv</span>
+        </div>
+    </div>
+
+    <div class="grid-container">
+
+        <div class="card">
+            <h2>Umweltwerte</h2>
+
+            <div class="sensor-grid">
+
+                <div class="sensor-box">
+                    <h3>Temperatur</h3>
+                    <p class="value" id="temperatur">-- °C</p>
+                    <span class="badge">OK</span>
+                </div>
+
+                <div class="sensor-box">
+                    <h3>Luftfeuchtigkeit</h3>
+                    <p class="value" id="luftfeuchtigkeit">-- %</p>
+                    <span class="badge">OK</span>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card">
+
+            <h2>Lüftersteuerung</h2>
+
+            <p>
+                <strong>Status:</strong>
+                <span id="motor-status">--</span>
+            </p>
+
+            <p>
+                <strong>Modus:</strong>
+                Automatik
+            </p>
+
+            <p>
+                <strong>Grund:</strong>
+                <span id="motor-grund">--</span>
+            </p>
+
+            <p>
+                <strong>Grenzwert:</strong>
+                <span id="grenzwert">--°C</span> 
+            </p>
+
+        </div>
+
+        <div class="card wide">
+
+            <h2>Zutritt ; Türstatus</h2>
+
+            <p><strong>Türstatus:</strong> Geschlossen</p>
+
+            <p>
+                <strong>Letzter RFID-Zugriff:</strong>
+                Max Mustermann
+            </p>
+
+            <p>
+                <strong>Zeitpunkt:</strong>
+                14:37 Uhr
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+async function ladeDaten() {
+
+    try {
+
+        const antwort =
+            await fetch("/api/sensordaten/?t=" + Date.now());
+
+        const daten = await antwort.json();
+
+        document.getElementById("temperatur").innerText =
+            daten.temperatur + " °C";
+
+        document.getElementById("luftfeuchtigkeit").innerText =
+            daten.luftfeuchtigkeit + " %";
+
+        document.getElementById("motor-status").innerText =
+            daten.motor;
+
+        document.getElementById("motor-grund").innerText =
+            daten.motor_grund;
+
+        document.getElementById("grenzwert").innerText =
+            daten.grenzwert + " °C";
+
+    }
+
+    catch (fehler) {
+
+        console.log("Fehler beim Laden:", fehler);
+
+    }
+
+}
+
+ladeDaten();
+
+setInterval(ladeDaten, 3000);
+
+</script>
+
+</body>
+</html>
