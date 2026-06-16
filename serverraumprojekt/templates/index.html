@@ -14,7 +14,6 @@
             <h1>Serverraum Dashboard</h1>
             <p>횥berwachungs- und Verwaltungssystem</p>
         </div>
-
         <div class="header-status">
             <span>System aktiv</span>
         </div>
@@ -22,15 +21,15 @@
 
     <div class="grid-container">
 
+        <!-- Umweltwerte -->
         <div class="card">
             <h2>Umweltwerte</h2>
-
             <div class="sensor-grid">
 
                 <div class="sensor-box">
                     <h3>Temperatur</h3>
-                    <p class="value" id="temperatur">-- 캜</p>
-                    <span class="badge">OK</span>
+                    <p class="value" id="temperatur">-- 째C</p>
+                    <span class="badge" id="badge-temp">OK</span>
                 </div>
 
                 <div class="sensor-box">
@@ -42,94 +41,76 @@
             </div>
         </div>
 
+        <!-- L체ftersteuerung -->
         <div class="card">
-
             <h2>L체ftersteuerung</h2>
-
-            <p>
-                <strong>Status:</strong>
-                <span id="motor-status">--</span>
-            </p>
-
-            <p>
-                <strong>Modus:</strong>
-                Automatik
-            </p>
-
-            <p>
-                <strong>Grund:</strong>
-                <span id="motor-grund">--</span>
-            </p>
-
-            <p>
-                <strong>Grenzwert:</strong>
-                <span id="grenzwert">--캜</span> 
-            </p>
-
+            <p><strong>Status:</strong> <span id="motor-status">--</span></p>
+            <p><strong>Modus:</strong> Automatik</p>
+            <p><strong>Grund:</strong> <span id="motor-grund">--</span></p>
+            <p><strong>Grenzwert:</strong> <span id="grenzwert">--</span> 째C</p>
         </div>
 
+        <!-- T체rstatus -->
         <div class="card wide">
+            <h2>Zutritt 쨌 T체rstatus</h2>
 
-            <h2>Zutritt ; T체rstatus</h2>
-
-            <p><strong>T체rstatus:</strong> Geschlossen</p>
+            <p>
+                <strong>T체rstatus:</strong>
+                <span id="tuer-status" style="font-weight:bold;">--</span>
+            </p>
 
             <p>
                 <strong>Letzter RFID-Zugriff:</strong>
-                Max Mustermann
-            </p>
-
-            <p>
-                <strong>Zeitpunkt:</strong>
-                14:37 Uhr
+                <span id="letzter-zugriff">--</span>
             </p>
 
         </div>
 
     </div>
-
 </div>
 
 <script>
-
 async function ladeDaten() {
-
     try {
-
-        const antwort =
-            await fetch("/api/sensordaten/?t=" + Date.now());
-
+        const antwort = await fetch("/api/sensordaten/?t=" + Date.now());
         const daten = await antwort.json();
 
+        // Umwelt
         document.getElementById("temperatur").innerText =
-            daten.temperatur + " 째C";
-
+            daten.temperatur !== null ? daten.temperatur + " 째C" : "-- 째C";
         document.getElementById("luftfeuchtigkeit").innerText =
-            daten.luftfeuchtigkeit + " %";
+            daten.luftfeuchtigkeit !== null ? daten.luftfeuchtigkeit + " %" : "-- %";
 
-        document.getElementById("motor-status").innerText =
-            daten.motor;
+        // L체fter
+        document.getElementById("motor-status").innerText  = daten.motor      ?? "--";
+        document.getElementById("motor-grund").innerText   = daten.motor_grund ?? "--";
+        document.getElementById("grenzwert").innerText     = daten.grenzwert   ?? "--";
 
-        document.getElementById("motor-grund").innerText =
-            daten.motor_grund;
+        // T체r 
+        const tuerOffen = daten.tuer_offen;
+        const tuerEl    = document.getElementById("tuer-status");
 
-        document.getElementById("grenzwert").innerText =
-            daten.grenzwert + " 째C";
+        if (tuerOffen === true) {
+            tuerEl.innerText  = "Ge철ffnet";
+            tuerEl.style.color ="#27ae60";
+        } else if (tuerOffen === false) {
+            tuerEl.innerText  = "Geschlossen";
+            tuerEl.style.color ="#e74c3c";
+        } else {
+            tuerEl.innerText  = "--";
+            tuerEl.style.color = "";
+        }
 
-    }
+        document.getElementById("letzter-zugriff").innerText =
+            daten.letzter_zugriff ?? "--";
 
-    catch (fehler) {
-
+    } catch (fehler) {
         console.log("Fehler beim Laden:", fehler);
-
     }
-
 }
 
 ladeDaten();
-
-setInterval(ladeDaten, 3000);
-
+setInterval(ladeDaten, 1000);
 </script>
 
 </body>
